@@ -1,0 +1,6 @@
+opencv-python
+tk
+pillow
+scipy
+cmake
+face_recognition

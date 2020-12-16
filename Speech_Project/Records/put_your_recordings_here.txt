@@ -1,0 +1,5 @@
+You need to put your recordings here with .wav format
+and fs should be 16000
+Alternatively you can run the program and record_voices here with .wav format
+Do not forget to install ffmpeg
+
