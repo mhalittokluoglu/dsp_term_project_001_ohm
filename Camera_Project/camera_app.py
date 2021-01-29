@@ -7,6 +7,9 @@ from datetime import datetime
 import training
 import face_recognition
 
+default_cam = 0
+fps = 5
+
 class CamProgram:
     def __init__(self,win):
 
@@ -47,13 +50,14 @@ class CamProgram:
 
     def open_cam_button_fnc(self):
         global is_moving_stat
+        global default_cam
+        global fps
         is_moving_stat = False
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(default_cam)
         ret, self.prev_frame = self.cap.read()
         ret, self.frame = self.cap.read()
         self.is_cam_open = True
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        fps = 5
         self.out = cv2.VideoWriter('MyVideo.avi', self.fourcc, fps, (640,480))
         self.open_cam()
 
@@ -66,8 +70,8 @@ class CamProgram:
             self.open_cam_button['state'] = 'disabled'
             now = datetime.now()
             self.current_time = now.strftime("%d/%m/%Y %H:%M:%S")
-            cv2.putText(self.frame,self.current_time,(280,30),cv2.FONT_HERSHEY_SIMPLEX,1,[0,0,0],2)
             frm2 = self.frame.copy()
+            cv2.putText(self.frame,self.current_time,(280,30),cv2.FONT_HERSHEY_SIMPLEX,1,[0,0,0],2)
             is_moving = self.motion_detection(frm2)
             if counter2 > 10:
                 frame2 = self.check_face(frm2)
@@ -75,6 +79,7 @@ class CamProgram:
             else:
                 frame2 = frm2
             counter2 += 1
+            cv2.putText(frm2,self.current_time,(280,30),cv2.FONT_HERSHEY_SIMPLEX,1,[0,0,0],2)
             frame_rgb = cv2.cvtColor(frame2,cv2.COLOR_BGR2RGB)
             if is_moving:
                 cv2.putText(frame_rgb,'Movement',(10,30),cv2.FONT_HERSHEY_SIMPLEX,1,[0,30,30],2)
@@ -117,7 +122,7 @@ class CamProgram:
         blur = cv2.GaussianBlur(gray,(7,7), cv2.BORDER_DEFAULT)
         _,thresh = cv2.threshold(blur, 20, 255, cv2.THRESH_BINARY)
         dilated = cv2.dilate(thresh,None,iterations = 3)
-        contours,_ = cv2.findContours(dilated,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        _,contours,_ = cv2.findContours(dilated,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         for contour in contours:
             (x,y,w,h) = cv2.boundingRect(contour)
             if cv2.contourArea(contour) > 100:
